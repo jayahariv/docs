@@ -242,20 +242,26 @@ Obtain unified tabular data and metadata, queried with MQL.
 **Parameters:**
 
 - `organization_id` [(str)](https://docs.python.org/3/library/stdtypes.html#text-sequence-type-str): The ID of the organization that owns the data.
-- `mql_binary` (List[bytes]): The MQL query to run as a list of BSON documents.
+- `mql_binary` (List[bytes]): The MQL query to run as a list of BSON queries. You can encode your bson queries using a library like `pymongo` or `bson`.
 
 **Returns:**
 
 - (List[Dict[str, ValueTypes]]): An array of data objects.
 
 ```python {class="line-numbers linkable-line-numbers"}
-tabular_data = await data_client.tabular_data_by_mql(
-    organization_id=organization_id,
-    mql_query=[
-        bson.dumps({'$match': {'location_id': '<location-id>'}}),
-        bson.dumps({"$limit": 5})
-    ]
-)
+# using bson
+import bson
+tabular_data = await data_client.tabular_data_by_mql(org_id="<your-org-id>", mql_binary=[
+    bson.dumps({ '$match': { 'location_id': '<location-id>' } }),
+    bson.dumps({ "$limit": 5 })
+])
+
+# using pymongo
+import bson
+tabular_data = await data_client.tabular_data_by_mql(org_id="<your-org-id>", mql_binary=[
+    bson.encode({ '$match': { 'location_id': '<location-id>' } }),
+    bson.encode({ "$limit": 5 })
+])
 ```
 
 You must `import bson` to create valid bson binary objects as input for the `tabular_data_by_mql` method.
